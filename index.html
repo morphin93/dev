@@ -76,53 +76,48 @@
         </div>
     </div>
 
-<script>
-    const tonweb = new TonWeb(); // Initialisation de TonWeb
+    <script>
+        const tonweb = new TonWeb(); // Initialisation de TonWeb
 
-    // Initialisation de TonConnect UI
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://raw.githubusercontent.com/morphin93/dev/refs/heads/main/tonconnect-manifest.json',
-        buttonRootId: 'connectWalletButton'
-    });
+        // Initialisation de TonConnect UI
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://raw.githubusercontent.com/morphin93/dev/refs/heads/main/tonconnect-manifest.json',
+            buttonRootId: 'connectWalletButton'
+        });
 
-    // Surveillance des changements d'état de la connexion
-    tonConnectUI.onStatusChange((walletInfo) => {
-        if (walletInfo) {
-            document.getElementById('walletInfo').style.display = 'block';
-            document.getElementById('walletAddress').textContent = walletInfo.account.address;
-            document.getElementById('createCharacterButton').style.display = 'block';
-        }
-    });
+        // Surveillance des changements d'état de la connexion
+        tonConnectUI.onStatusChange((walletInfo) => {
+            if (walletInfo) {
+                document.getElementById('walletInfo').style.display = 'block';
+                document.getElementById('walletAddress').textContent = walletInfo.account.address;
+                document.getElementById('createCharacterButton').style.display = 'block';
+            }
+        });
 
-    // Fonction pour créer un personnage avec un payload approprié
-    document.getElementById('createCharacterButton').addEventListener('click', async () => {
-        try {
-            const cell = new tonweb.boc.Cell();
-            cell.bits.writeUint(2, 32); // Écrire l'opcode '2' pour créer un personnage
+        // Fonction pour créer un personnage avec un payload approprié
+        document.getElementById('createCharacterButton').addEventListener('click', async () => {
+            try {
+                const cell = new tonweb.boc.Cell();
+                cell.bits.writeUint(2, 32); // Écrire l'opcode '2' pour créer un personnage
 
-            const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [
-                    {
-                        address: 'EQAS3KiQmju2bR4ZrVIZ2CJBWr7SSuR2n2cNXyaqBe709GNp',
-                        amount: '10000000', // 0.01 TON en nanoTON
-                        payload: cell.toBoc().toString('base64') // Conversion du payload en base64
-                    }
-                ]
-            };
+                const transaction = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600,
+                    messages: [
+                        {
+                            address: 'EQAS3KiQmju2bR4ZrVIZ2CJBWr7SSuR2n2cNXyaqBe709GNp',
+                            amount: tonweb.utils.toNano('0.01').toString(), // Conversion de 0.01 TON en nanoTON
+                            payload: cell.toBoc().toString('base64') // Conversion du payload en base64
+                        }
+                    ]
+                };
 
-            const result = await tonConnectUI.sendTransaction(transaction);
-            console.log('Transaction envoyée:', result);
-            alert('Personnage créé avec succès !');
-        } catch (error) {
-            console.error('Erreur lors de la création du personnage:', error);
-            alert('Erreur lors de la création du personnage.');
-        }
-    });
-</script>
-
-
+                const result = await tonConnectUI.sendTransaction(transaction);
+                console.log('Transaction envoyée:', result);
+                alert('Personnage créé avec succès !');
+            } catch (error) {
+                console.error('Erreur lors de la création du personnage:', error);
+                alert('Erreur lors de la création du personnage.');
+            }
+        });
+    </script>
 </body>
-
-</html>
-
