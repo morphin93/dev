@@ -65,13 +65,13 @@
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 </head>
 <body>
-
     <div class="container">
-        <div id="connectWalletButton"></div> <!-- Le bouton de connexion sera affiché ici -->
+        <div id="connectWalletButton"></div>
         <div class="wallet-info" id="walletInfo" style="display: none;">
             <h2>Avatars</h2>
             <p>Adresse: <span class="data" id="walletAddress">-</span></p>
             <p>Solde: <span class="data" id="walletBalance">-</span></p>
+            <button id="createCharacterButton" style="display: none;">Create Character</button>
         </div>
     </div>
 
@@ -79,7 +79,7 @@
         // Initialisation de TonConnect UI
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/morphin93/dev/refs/heads/main/tonconnect-manifest.json',
-            buttonRootId: 'connectWalletButton' // Affiche le bouton de connexion
+            buttonRootId: 'connectWalletButton'
         });
 
         // Surveillance des changements d'état de la connexion
@@ -88,11 +88,34 @@
                 document.getElementById('walletInfo').style.display = 'block';
                 document.getElementById('walletAddress').textContent = walletInfo.account.address;
                 document.getElementById('walletBalance').textContent = walletInfo.account.balance || 'N/A';
-                 
+                document.getElementById('createCharacterButton').style.display = 'block';
+            }
+        });
+
+        // Fonction pour créer un personnage
+        document.getElementById('createCharacterButton').addEventListener('click', async () => {
+            try {
+                const transaction = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600,
+                    messages: [
+                        {
+                            address: 'EQAS3KiQmju2bR4ZrVIZ2CJBWr7SSuR2n2cNXyaqBe709GNp',
+                            amount: '10000000', // 0.01 TON en nanoTON
+                            payload: '00000002' // Opcode pour créer un personnage
+                        }
+                    ]
+                };
+
+                const result = await tonConnectUI.sendTransaction(transaction);
+                console.log('Transaction envoyée:', result);
+                alert('Personnage créé avec succès !');
+            } catch (error) {
+                console.error('Erreur lors de la création du personnage:', error);
+                alert('Erreur lors de la création du personnage.');
             }
         });
     </script>
-
 </body>
+
 </html>
 
