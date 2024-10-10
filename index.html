@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Wallet</title>
+    <!-- Import de TonConnect UI -->
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Connect to TON Wallet</h1>
+        <div id="connectWalletButton"></div> <!-- Le bouton de connexion sera affiché ici -->
+    </div>
+
+    <script>
+        // Initialisation de TonConnect UI
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://raw.githubusercontent.com/morphin93/dev/refs/heads/main/tonconnect-manifest.json',
+            buttonRootId: 'connectWalletButton' // Affiche le bouton de connexion
+        });
+
+        // Surveillance des changements d'état de la connexion
+        tonConnectUI.onStatusChange((walletInfo) => {
+            if (walletInfo) {
+                alert('Portefeuille connecté avec succès !');
+            }
+        });
+    </script>
+
+</body>
+</html>
