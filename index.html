@@ -5,6 +5,60 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connect Wallet</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #connectWalletButton {
+            margin-bottom: 20px;
+        }
+
+        .wallet-info {
+            background-color: #f0f4f8;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .wallet-info h2 {
+            font-size: 18px;
+            margin: 0 0 10px;
+        }
+
+        .wallet-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .wallet-info .data {
+            font-weight: 500;
+            color: #333;
+        }
+    </style>
     <!-- Import de TonConnect UI -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 </head>
@@ -13,6 +67,11 @@
     <div class="container">
         <h1>Connect to TON Wallet</h1>
         <div id="connectWalletButton"></div> <!-- Le bouton de connexion sera affiché ici -->
+        <div class="wallet-info" id="walletInfo" style="display: none;">
+            <h2>Informations du portefeuille</h2>
+            <p>Adresse: <span class="data" id="walletAddress">-</span></p>
+            <p>Solde: <span class="data" id="walletBalance">-</span></p>
+        </div>
     </div>
 
     <script>
@@ -25,6 +84,9 @@
         // Surveillance des changements d'état de la connexion
         tonConnectUI.onStatusChange((walletInfo) => {
             if (walletInfo) {
+                document.getElementById('walletInfo').style.display = 'block';
+                document.getElementById('walletAddress').textContent = walletInfo.account.address;
+                document.getElementById('walletBalance').textContent = walletInfo.account.balance || 'N/A';
                 alert('Portefeuille connecté avec succès !');
             }
         });
@@ -32,3 +94,4 @@
 
 </body>
 </html>
+
