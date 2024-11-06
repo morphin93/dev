@@ -29,7 +29,7 @@
         const counterValueElement = document.getElementById('counter-value');
 
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
-        const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC'));
+        const tonweb = new window.TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC'));
 
         // Créer une instance de l'adresse du contrat
         const contract = new tonweb.Contract({
