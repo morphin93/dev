@@ -12,9 +12,9 @@
     <h1>Interagir avec un Smart Contract sur TON 9</h1>
     <!-- Bouton de connexion TON Keeper -->
     <div id="ton-connect"></div>
-
+    <br>
     <!-- Boutons d'incrémentation et de lecture (sans l'attribut disabled) -->
-    <button id="increment-btn">Incrémenter le Compteur</button>
+     
     <button id="get-counter-btn">Obtenir la Valeur du Compteur</button>
     <p id="counter-value"></p>
 
@@ -24,8 +24,7 @@
             buttonRootId: 'ton-connect'
         });
 
-        const incrementButton = document.getElementById('increment-btn');
-        const getCounterButton = document.getElementById('get-counter-btn');
+        
         const counterValueElement = document.getElementById('counter-value');
 
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
@@ -37,26 +36,7 @@
             provider: tonweb.provider,
         });
 
-        // Fonction pour envoyer une transaction d'incrémentation
-        async function incrementCounter() {
-            console.log('Tentative d\'envoi de la transaction pour incrémenter le compteur...');
-            try {
-                const transaction = {
-                    to: contractAddress,
-                    value: TonWeb.utils.toNano(0.01),
-                    payload: TonWeb.utils.bytesToHex(new TextEncoder().encode('increment'))
-                };
-                console.log('Détails de la transaction:', transaction);
-
-                // Envoie de la transaction via TON Keeper
-                const result = await tonConnectUI.sendTransaction(transaction);
-                console.log('Transaction envoyée avec succès:', result);
-                alert('Transaction envoyée pour incrémenter le compteur!');
-            } catch (error) {
-                console.error('Erreur lors de l\'envoi de la transaction:', error);
-                alert('Erreur lors de l\'envoi de la transaction');
-            }
-        }
+ 
 
         // Fonction pour appeler le getter et obtenir la valeur du compteur
         async function getCounterValue() {
@@ -71,10 +51,10 @@
                 alert('Erreur lors de l\'appel du getter');
             }
         }
-
-        // Ajouter des écouteurs pour les boutons
-        incrementButton.addEventListener('click', incrementCounter);
+ 
         getCounterButton.addEventListener('click', getCounterValue);
+
+        
     </script>
 </body>
 </html>
