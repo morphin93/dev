@@ -29,10 +29,13 @@
         const counterValueElement = document.getElementById('counter-value');
 
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
-        const tonweb = new window.TonWeb((new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC')));
-      
+        const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC'));
 
- 
+        // Créer une instance de l'adresse du contrat
+        const contract = new tonweb.Contract({
+            address: new TonWeb.utils.Address(contractAddress),
+            provider: tonweb.provider,
+        });
 
         // Fonction pour envoyer une transaction d'incrémentation
         async function incrementCounter() {
@@ -59,8 +62,8 @@
         async function getCounterValue() {
             console.log('Appel du getter pour obtenir la valeur du compteur...');
             try {
-                const result = await tonweb.provider.callGetMethod(contractAddress, 'value', []);
-                const counterValue = result.stack[0][1];
+                const result = await contract.methods.get({}).call();
+                const counterValue = result.value; // Remplacez par le champ correct de la valeur renvoyée.
                 console.log('Valeur actuelle du compteur:', counterValue);
                 counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
             } catch (error) {
@@ -68,6 +71,7 @@
                 alert('Erreur lors de l\'appel du getter');
             }
         }
+
         // Ajouter des écouteurs pour les boutons
         incrementButton.addEventListener('click', incrementCounter);
         getCounterButton.addEventListener('click', getCounterValue);
