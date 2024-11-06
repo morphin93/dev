@@ -9,18 +9,16 @@
     <script src="https://unpkg.com/tonweb@0.0.55/tonweb.js"></script>
 </head>
 <body>
-    <h1>Interagir avec un Smart Contract sur TON</h1>
-    <!-- Bouton de connexion TON Keeper -->
+    <h1>Interagir avec un Smart Contract sur TON version 02</h1>
+    <!-- Conteneur pour le bouton de connexion -->
     <div id="ton-connect"></div>
 
-    <!-- Boutons d'incrémentation et de lecture -->
     <button id="increment-btn" disabled>Incrémenter le Compteur</button>
     <button id="get-counter-btn" disabled>Obtenir la Valeur du Compteur</button>
     <p id="counter-value"></p>
 
     <script>
-        const TonConnect = window.TonConnect;
-        const tonConnectUI = new TonConnect.TonConnectUI({
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/morphin93/dev/refs/heads/main/tonconnect-manifest.json',
             buttonRootId: 'ton-connect'
         });
@@ -29,36 +27,26 @@
         const getCounterButton = document.getElementById('get-counter-btn');
         const counterValueElement = document.getElementById('counter-value');
 
-        // Adresse du smart contract sur le testnet
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
-
-        // Initialisation de TonWeb pour interagir avec le smart contract
         const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC'));
 
-        // Activer les boutons après connexion
         tonConnectUI.onStatusChange((wallet) => {
             if (wallet) {
                 incrementButton.disabled = false;
                 getCounterButton.disabled = false;
-                console.log('Connecté avec le wallet :', wallet);
             } else {
                 incrementButton.disabled = true;
                 getCounterButton.disabled = true;
-                console.log('Déconnecté');
             }
         });
 
-        // Fonction pour envoyer une transaction d'incrémentation
         async function incrementCounter() {
             try {
-                // Configuration de la transaction d'incrémentation
                 const transaction = {
                     to: contractAddress,
-                    value: TonWeb.utils.toNano(0.01), // Montant en TON
-                    payload: TonWeb.utils.bytesToHex(new TextEncoder().encode('increment')), // Charge utile pour appeler 'increment'
+                    value: TonWeb.utils.toNano(0.01),
+                    payload: TonWeb.utils.bytesToHex(new TextEncoder().encode('increment'))
                 };
-
-                // Envoie la transaction via TON Keeper
                 await tonConnectUI.sendTransaction(transaction);
                 alert('Transaction envoyée pour incrémenter le compteur!');
             } catch (error) {
@@ -66,22 +54,20 @@
             }
         }
 
-        // Fonction pour appeler le getter et obtenir la valeur du compteur
         async function getCounterValue() {
             try {
                 const result = await tonweb.provider.callGetMethod(contractAddress, 'value', []);
-                const counterValue = result.stack[0][1]; // Extraire la valeur du compteur
+                const counterValue = result.stack[0][1];
                 counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
             } catch (error) {
                 console.error('Erreur lors de l\'appel du getter:', error);
             }
         }
 
-        // Écouteurs pour les boutons
         incrementButton.addEventListener('click', incrementCounter);
         getCounterButton.addEventListener('click', getCounterValue);
     </script>
-    <p>version 01</p>
 </body>
 </html>
+
 
