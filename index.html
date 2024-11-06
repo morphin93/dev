@@ -9,13 +9,13 @@
     <script src="https://unpkg.com/tonweb@0.0.55/tonweb.js"></script>
 </head>
 <body>
-    <h1>Interagir avec un Smart Contract sur TON v4</h1>
+    <h1>Interagir avec un Smart Contract sur TON</h1>
     <!-- Bouton de connexion TON Keeper -->
     <div id="ton-connect"></div>
 
-    <!-- Boutons d'incrémentation et de lecture -->
-    <button id="increment-btn" >Incrémenter le Compteur</button>
-    <button id="get-counter-btn" >Obtenir la Valeur du Compteur</button>
+    <!-- Boutons d'incrémentation et de lecture (sans l'attribut disabled) -->
+    <button id="increment-btn">Incrémenter le Compteur</button>
+    <button id="get-counter-btn">Obtenir la Valeur du Compteur</button>
     <p id="counter-value"></p>
 
     <script>
@@ -35,16 +35,15 @@
         tonConnectUI.onStatusChange(async (wallet) => {
             if (wallet) {
                 try {
-                    const address = await wallet.getAddress();  // Récupérer l'adresse du wallet
+                    const address = await wallet.getAddress();
                     if (address) {
-                        incrementButton.disabled = false;
-                        getCounterButton.disabled = false;
                         console.log('Connecté avec le wallet:', address);
                     }
                 } catch (error) {
                     console.error('Erreur lors de la récupération de l\'adresse du wallet:', error);
                 }
             } else {
+                // Désactiver les boutons en cas de déconnexion
                 incrementButton.disabled = true;
                 getCounterButton.disabled = true;
                 console.log('Déconnecté');
@@ -53,27 +52,36 @@
 
         // Fonction pour envoyer une transaction d'incrémentation
         async function incrementCounter() {
+            console.log('Tentative d\'envoi de la transaction pour incrémenter le compteur...');
             try {
                 const transaction = {
                     to: contractAddress,
                     value: TonWeb.utils.toNano(0.01),
                     payload: TonWeb.utils.bytesToHex(new TextEncoder().encode('increment'))
                 };
-                await tonConnectUI.sendTransaction(transaction);
+                console.log('Détails de la transaction:', transaction);
+
+                // Envoie de la transaction via TON Keeper
+                const result = await tonConnectUI.sendTransaction(transaction);
+                console.log('Transaction envoyée avec succès:', result);
                 alert('Transaction envoyée pour incrémenter le compteur!');
             } catch (error) {
                 console.error('Erreur lors de l\'envoi de la transaction:', error);
+                alert('Erreur lors de l\'envoi de la transaction');
             }
         }
 
         // Fonction pour appeler le getter et obtenir la valeur du compteur
         async function getCounterValue() {
+            console.log('Appel du getter pour obtenir la valeur du compteur...');
             try {
                 const result = await tonweb.provider.callGetMethod(contractAddress, 'value', []);
                 const counterValue = result.stack[0][1];
+                console.log('Valeur actuelle du compteur:', counterValue);
                 counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
             } catch (error) {
                 console.error('Erreur lors de l\'appel du getter:', error);
+                alert('Erreur lors de l\'appel du getter');
             }
         }
 
@@ -83,5 +91,4 @@
     </script>
 </body>
 </html>
-
 
