@@ -31,24 +31,7 @@
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
         const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC'));
 
-        // Vérifier l'état de connexion et activer les boutons si connecté
-        tonConnectUI.onStatusChange(async (wallet) => {
-            if (wallet) {
-                try {
-                    const address = await wallet.getAddress();
-                    if (address) {
-                        console.log('Connecté avec le wallet:', address);
-                    }
-                } catch (error) {
-                    console.error('Erreur lors de la récupération de l\'adresse du wallet:', error);
-                }
-            } else {
-                // Désactiver les boutons en cas de déconnexion
-                incrementButton.disabled = true;
-                getCounterButton.disabled = true;
-                console.log('Déconnecté');
-            }
-        });
+ 
 
         // Fonction pour envoyer une transaction d'incrémentation
         async function incrementCounter() {
@@ -84,7 +67,6 @@
                 alert('Erreur lors de l\'appel du getter');
             }
         }
-
         // Ajouter des écouteurs pour les boutons
         incrementButton.addEventListener('click', incrementCounter);
         getCounterButton.addEventListener('click', getCounterValue);
