@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/tonweb@0.0.55/tonweb.js"></script>
 </head>
 <body>
-    <h1>Interagir avec un Smart Contract sur TON v3</h1>
+    <h1>Interagir avec un Smart Contract sur TON v4</h1>
     <!-- Bouton de connexion TON Keeper -->
     <div id="ton-connect"></div>
 
@@ -32,11 +32,18 @@
         const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC'));
 
         // Vérifier l'état de connexion et activer les boutons si connecté
-        tonConnectUI.onStatusChange((wallet) => {
-            if (wallet && wallet.address) {
-                incrementButton.disabled = false;
-                getCounterButton.disabled = false;
-                console.log('Connecté avec le wallet:', wallet.address);
+        tonConnectUI.onStatusChange(async (wallet) => {
+            if (wallet) {
+                try {
+                    const address = await wallet.getAddress();  // Récupérer l'adresse du wallet
+                    if (address) {
+                        incrementButton.disabled = false;
+                        getCounterButton.disabled = false;
+                        console.log('Connecté avec le wallet:', address);
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de la récupération de l\'adresse du wallet:', error);
+                }
             } else {
                 incrementButton.disabled = true;
                 getCounterButton.disabled = true;
@@ -76,6 +83,5 @@
     </script>
 </body>
 </html>
-
 
 
