@@ -38,10 +38,10 @@
         async function getCounterValue() {
             console.log('Appel du getter pour obtenir la valeur du compteur...');
             try {
-                const result = await tonweb.provider.callGetMethod(contractAddress, 'value', []);
-                const counterValue = result.stack[0][1];
+     // Utilisez runGetMethod pour appeler le getter "value" du contrat
+                const result = await contract.methods.runGetMethod('value');
+                const counterValue = result.stack[0][1]; // Accéder à la valeur depuis le résultat de la pile
                 console.log('Valeur actuelle du compteur:', counterValue);
-                counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
             } catch (error) {
                 console.error('Erreur lors de l\'appel du getter:', error);
                 alert('Erreur lors de l\'appel du getter');
