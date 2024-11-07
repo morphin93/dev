@@ -34,20 +34,17 @@
         // Initialiser TonWeb
         const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC', {apiKey: 'e830ebb01dbfdbe16f8a03cde28af8ec468b1acae542a43ec39c7edf90465a2e'}));
    
-
-        // Créer une instance du contrat avec TonWeb
-        const contract = new tonweb.Contract({
-            address: new TonWeb.utils.Address(contractAddress)
-        });
+        // Créer une instance de l'adresse du contrat
+        const contractAddressObj = new TonWeb.utils.Address(contractAddress);
 
         // Fonction pour appeler le getter et obtenir la valeur du compteur
         async function callGetter() {
             console.log('Appel du getter pour obtenir la valeur du compteur...');
             try {
                 // Utiliser runGetMethod() pour appeler la méthode "value"
-                const result = await contract.methods.runGetMethod('value');
-                
-                // Accéder à la valeur du compteur (le format dépend du smart contract)
+                const result = await tonweb.provider.call(contractAddressObj, 'value', []);
+
+                // Accéder à la valeur du compteur
                 const counterValue = result.stack[0][1];  // Assurez-vous que cela correspond à la valeur correcte de la pile
                 console.log('Valeur actuelle du compteur:', counterValue);
 
@@ -64,3 +61,4 @@
     </script>
 </body>
 </html>
+
