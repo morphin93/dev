@@ -4,61 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion avec TON Keeper</title>
-    <!-- Inclure le script TonConnect UI -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/tonweb@latest/dist/tonweb.js"></script>
 </head>
 <body>
     <h1>Interagir avec un Smart Contract sur TON Alpha VSC 2</h1>
-    <!-- Bouton de connexion TON Keeper -->
     <div id="ton-connect"></div>
-
-    <!-- Bouton pour obtenir la valeur du compteur -->
     <button id="get-counter-btn">Obtenir la Valeur du Compteur</button>
+    <button id="increment-counter-btn">Incrémenter le Compteur</button>
     <p id="counter-value"></p>
 
     <script>
-        // Initialiser TON Connect UI
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/morphin93/dev/refs/heads/main/tonconnect-manifest.json',
             buttonRootId: 'ton-connect'
         });
 
-        // Récupérer les éléments DOM
         const getCounterButton = document.getElementById('get-counter-btn');
+        const incrementCounterButton = document.getElementById('increment-counter-btn');
         const counterValueElement = document.getElementById('counter-value');
-
-        // Adresse du contrat intelligent
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
 
-        // Initialiser TonWeb
         const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC', {apiKey: 'e830ebb01dbfdbe16f8a03cde28af8ec468b1acae542a43ec39c7edf90465a2e'}));
    
-        // Créer une instance de l'adresse du contrat
         const contractAddressObj = new TonWeb.utils.Address(contractAddress);
 
-        // Fonction pour appeler le getter et obtenir la valeur du compteur
         async function callGetter() {
             console.log('Appel du getter pour obtenir la valeur du compteur...');
             try {
-                // Utiliser runGetMethod() pour appeler la méthode "value"
-                const result = await tonweb.provider.call(contractAddressObj, 'value', []);
+                const result = await tonweb.call(contractAddressObj, 'value', []);
 
-                // Accéder à la valeur du compteur
-                const counterValue = result.stack[0][1];  // Assurez-vous que cela correspond à la valeur correcte de la pile
-                console.log('Valeur actuelle du compteur:', counterValue);
+                if (result && result.stack && result.stack.length > 0) {
+                    const counterValue = parseInt(result.stack[0][1], 16);
+                    console.log('Valeur actuelle du compteur:', counterValue);
 
-                // Afficher la valeur dans l'élément DOM
-                counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
+                    counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
+                } else {
+                    console.error("Le format de la réponse n'est pas valide :", result);
+                }
             } catch (error) {
                 console.error('Erreur lors de l\'appel du getter:', error);
                 alert('Erreur lors de l\'appel du getter');
             }
         }
 
-        // Ajouter un écouteur d'événement sur le bouton pour obtenir la valeur du compteur
+        async function incrementCounter() {
+        console.log('Envoi du message d\'incrémentation...');
+        try {
+            // Création d'une cellule BOC pour la transaction
+            const cell = new TonWeb.boc.Cell();
+            cell.bits.writeUint(0, 32); // Code pour une transaction externe simple
+            cell.bits.writeString("increment"); // Identifiant de la méthode (ou utilisez l'ID si nécessaire)
+
+            // Envoi de la transaction via TonConnect
+            await tonConnectUI.sendTransaction({
+                to: contractAddress,
+                value: TonWeb.utils.toNano('0.05'), // Montant pour couvrir les frais de transaction
+                data: cell.toBoc() // Conversion de la cellule en BOC pour la transaction
+            });
+            
+            console.log('Message d\'incrémentation envoyé avec succès');
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi du message d\'incrémentation:', error);
+            alert('Erreur lors de l\'incrémentation');
+        }
+    }
         getCounterButton.addEventListener('click', callGetter);
+        incrementCounterButton.addEventListener('click', incrementCounter);
     </script>
 </body>
 </html>
-
