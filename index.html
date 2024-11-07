@@ -6,52 +6,62 @@
     <title>Connexion avec TON Keeper</title>
     <!-- Inclure le script TonConnect UI -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <script src="tonweb.js"></script>
+    <script src="https://unpkg.com/tonweb@latest/dist/tonweb.js"></script>
 </head>
 <body>
-    <h1>Interagir avec un Smart Contract sur TON Alpha vsc</h1>
+    <h1>Interagir avec un Smart Contract sur TON Alpha VSC</h1>
     <!-- Bouton de connexion TON Keeper -->
     <div id="ton-connect"></div>
 
-    <!-- Boutons d'incrémentation et de lecture (sans l'attribut disabled) -->
-     
+    <!-- Bouton pour obtenir la valeur du compteur -->
     <button id="get-counter-btn">Obtenir la Valeur du Compteur</button>
     <p id="counter-value"></p>
 
     <script>
+        // Initialiser TON Connect UI
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/morphin93/dev/refs/heads/main/tonconnect-manifest.json',
             buttonRootId: 'ton-connect'
         });
 
-        
+        // Récupérer les éléments DOM
         const getCounterButton = document.getElementById('get-counter-btn');
         const counterValueElement = document.getElementById('counter-value');
 
+        // Adresse du contrat intelligent
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
-        const tonweb = new window.TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: 'e830ebb01dbfdbe16f8a03cde28af8ec468b1acae542a43ec39c7edf90465a2e'}));
-      const contract = new tonweb.Contract({
+
+        // Initialiser TonWeb
+        const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
+            apiKey: 'e830ebb01dbfdbe16f8a03cde28af8ec468b1acae542a43ec39c7edf90465a2e'
+        }));
+
+        // Créer une instance du contrat avec TonWeb
+        const contract = new tonweb.Contract({
             address: new TonWeb.utils.Address(contractAddress)
         });
 
- 
-
         // Fonction pour appeler le getter et obtenir la valeur du compteur
-        async function getCounterValue() {
+        async function callGetter() {
             console.log('Appel du getter pour obtenir la valeur du compteur...');
             try {
-     // Utilisez runGetMethod pour appeler le getter "value" du contrat
+                // Utiliser runGetMethod() pour appeler la méthode "value"
                 const result = await contract.methods.runGetMethod('value');
-                const counterValue = result.stack[0][1]; // Accéder à la valeur depuis le résultat de la pile
+                
+                // Accéder à la valeur du compteur (le format dépend du smart contract)
+                const counterValue = result.stack[0][1];  // Assurez-vous que cela correspond à la valeur correcte de la pile
                 console.log('Valeur actuelle du compteur:', counterValue);
+
+                // Afficher la valeur dans l'élément DOM
+                counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
             } catch (error) {
                 console.error('Erreur lors de l\'appel du getter:', error);
                 alert('Erreur lors de l\'appel du getter');
             }
         }
-    
-        getCounterButton.addEventListener('click', getCounterValue);
 
+        // Ajouter un écouteur d'événement sur le bouton pour obtenir la valeur du compteur
+        getCounterButton.addEventListener('click', callGetter);
     </script>
 </body>
 </html>
