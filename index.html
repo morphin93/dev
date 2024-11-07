@@ -32,9 +32,8 @@
         const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
 
         // Initialiser TonWeb
-        const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
-            apiKey: 'e830ebb01dbfdbe16f8a03cde28af8ec468b1acae542a43ec39c7edf90465a2e'
-        }));
+        const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC', {apiKey: 'e830ebb01dbfdbe16f8a03cde28af8ec468b1acae542a43ec39c7edf90465a2e'}));
+   
 
         // Créer une instance du contrat avec TonWeb
         const contract = new tonweb.Contract({
