@@ -49,26 +49,34 @@
         }
 
         async function incrementCounter() {
-        console.log('Envoi du message d\'incrémentation...');
-        try {
-            // Création d'une cellule BOC pour la transaction
-            const cell = new TonWeb.boc.Cell();
-            cell.bits.writeUint(0, 32); // Code pour une transaction externe simple
-            cell.bits.writeString("increment"); // Identifiant de la méthode (ou utilisez l'ID si nécessaire)
+            console.log('Envoi du message d\'incrémentation...');
+            try {
+                // Création d'une cellule BOC pour la transaction
+                const cell = new TonWeb.boc.Cell();
+                cell.bits.writeUint(0, 32); // Code pour une transaction externe simple
+                cell.bits.writeString("increment"); // Identifiant de la méthode (ou utilisez l'ID si nécessaire)
 
-            // Envoi de la transaction via TonConnect
-            await tonConnectUI.sendTransaction({
-                to: contractAddress,
-                value: TonWeb.utils.toNano('0.05'), // Montant pour couvrir les frais de transaction
-                data: cell.toBoc() // Conversion de la cellule en BOC pour la transaction
-            });
-            
-            console.log('Message d\'incrémentation envoyé avec succès');
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi du message d\'incrémentation:', error);
-            alert('Erreur lors de l\'incrémentation');
+                // Vérifiez que l'utilisateur est connecté
+                const isConnected = await tonConnectUI.isConnected();
+                if (!isConnected) {
+                    alert("Veuillez vous connecter à TON Keeper avant de continuer.");
+                    return;
+                }
+
+                // Envoi de la transaction via TonConnect
+                await tonConnectUI.sendTransaction({
+                    to: contractAddress,
+                    value: TonWeb.utils.toNano('0.05'), // Montant pour couvrir les frais de transaction
+                    data: cell.toBoc() // Conversion de la cellule en BOC pour la transaction
+                });
+                
+                console.log('Message d\'incrémentation envoyé avec succès');
+            } catch (error) {
+                console.error('Erreur lors de l\'envoi du message d\'incrémentation:', error);
+                alert('Erreur lors de l\'incrémentation');
+            }
         }
-    }
+
         getCounterButton.addEventListener('click', callGetter);
         incrementCounterButton.addEventListener('click', incrementCounter);
     </script>
