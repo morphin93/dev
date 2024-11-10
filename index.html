@@ -10,8 +10,8 @@
 <body>
     <h1>Interagir avec un Smart Contract sur TON Alpha VSC 1000</h1>
     <div id="ton-connect"></div>
-    <button id="get-counter-btn">Obtenir la Valeur du Compteur</button>
-    <button id="increment-counter-btn">Incrémenter le Compteur</button>
+    <button id="get-counter-btn">Obtenir Player</button>
+    <button id="increment-counter-btn">Crée Player</button>
     <p id="counter-value"></p>
 
     <script>
@@ -23,57 +23,66 @@
         const getCounterButton = document.getElementById('get-counter-btn');
         const incrementCounterButton = document.getElementById('increment-counter-btn');
         const counterValueElement = document.getElementById('counter-value');
-        const contractAddress = 'EQDcR3pfOO45NGNbWChbCgKwB-sGDJDdC-0lE1NtjZfOlfx0';
+        const contractAddress = 'EQDQ-U2CvfjLGNcvhUFN21_IKbqiE_PhE73a_pIygxQM5W7w';
 
         const tonweb = new TonWeb(new TonWeb.HttpProvider('https://testnet.toncenter.com/api/v2/jsonRPC', {apiKey: 'e830ebb01dbfdbe16f8a03cde28af8ec468b1acae542a43ec39c7edf90465a2e'}));
-   
+    
         const contractAddressObj = new TonWeb.utils.Address(contractAddress);
 
         async function callGetter() {
-            console.log('Appel du getter pour obtenir la valeur du compteur...');
-            try {
-                const result = await tonweb.call(contractAddressObj, 'value', []);
+    console.log("Appel du getter pour obtenir les informations du joueur...");
+    try {
+        // Récupérer l'adresse du wallet connecté et la convertir en hexadécimal
+        const rawAddress = tonConnectUI.wallet.account.address;  
+        const adrObj = new TonWeb.utils.Address(rawAddress);
+        const HexWallet = adrObj.toString(true, true, true);
 
-                if (result && result.stack && result.stack.length > 0) {
-                    const counterValue = parseInt(result.stack[0][1], 16);
-                    console.log('Valeur actuelle du compteur:', counterValue);
+        // Appeler le getter 'getPlayer' en passant l'adresse comme argument
+        const result = await tonweb.call(contractAddressObj, 'getPlayer', [['tvm.Cell', HexWallet]]);
 
-                    counterValueElement.innerText = 'Valeur actuelle du compteur : ' + counterValue;
-                } else {
-                    console.error("Le format de la réponse n'est pas valide :", result);
-                }
-            } catch (error) {
-                console.error('Erreur lors de l\'appel du getter:', error);
-                alert('Erreur lors de l\'appel du getter');
+        if (result && result.stack && result.stack.length > 0) {
+            if (result.stack[0][0] === 'null' || result.stack[0][1] === '0x0') {
+                console.log("Aucun joueur trouvé pour cette adresse.");
+            } else {
+                const playerData = result.stack[0][1];
+                console.log("Joueur trouvé :", playerData);
             }
+        } else {
+            console.error("Le format de la réponse n'est pas valide :", result);
         }
+    } catch (error) {
+        console.error("Erreur lors de l'appel du getter :", error);
+    }
+}
 
+
+
+        // Fonction pour créer un joueur (envoie une transaction)
         async function incrementCounter() {
-            console.log('Envoi du message d\'incrémentation...');
             try {
-                // Création d'une cellule BOC pour la transaction
                 const cell = new TonWeb.boc.Cell();
-                cell.bits.writeUint(0, 32); // Code pour une transaction externe simple
-                cell.bits.writeString("increment"); // Identifiant de la méthode (ou utilisez l'ID si nécessaire)
+                cell.bits.writeUint(0, 32); // Indicateur pour un message texte
+                cell.bits.writeString("createPlayer"); // Contient le message "createPlayer"
+                const bocData = await cell.toBoc();
+                const base64Boc = TonWeb.utils.bytesToBase64(bocData); // Encode en base64 pour TonConnect
 
-                // Vérifiez que l'utilisateur est connecté
-                const isConnected = await tonConnectUI.isConnected();
-                if (!isConnected) {
-                    alert("Veuillez vous connecter à TON Keeper avant de continuer.");
-                    return;
-                }
+                // Utiliser la même adresse que celle utilisée pour le getter
+                const contractAddressHex = contractAddressObj.toString(true, true, true); // Convertit en format hexadécimal, sans préfixe
 
-                // Envoi de la transaction via TonConnect
-                await tonConnectUI.sendTransaction({
-                    to: contractAddress,
-                    value: TonWeb.utils.toNano('0.05'), // Montant pour couvrir les frais de transaction
-                    data: cell.toBoc() // Conversion de la cellule en BOC pour la transaction
-                });
-                
-                console.log('Message d\'incrémentation envoyé avec succès');
+                const transaction = {
+                    messages: [
+                        {
+                            address: contractAddressHex, // Utilisation de l'adresse en format hexadécimal
+                            amount: "50000000", // Montant de la transaction en nanoTONs (0.05 TON)
+                            payload: base64Boc
+                        }
+                    ]
+                };
+
+                const result = await tonConnectUI.sendTransaction(transaction);
+                console.log("Transaction envoyée avec succès :", result);
             } catch (error) {
-                console.error('Erreur lors de l\'envoi du message d\'incrémentation:', error);
-                alert('Erreur lors de l\'incrémentation');
+                console.error("Erreur lors de l'envoi de la transaction :", error);
             }
         }
 
